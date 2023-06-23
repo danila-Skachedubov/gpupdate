@@ -87,18 +87,14 @@ class kde_applier_user(applier_frontend):
                 os.environ["XDG_DATA_DIRS"] = f"{get_homedir(self.username)}.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share/kf5:/usr/share:/var/lib/snapd/desktop"#Variable for system detection of directories before files with .colors extension
                 os.environ["DISPLAY"] = ":0"#Variable for command execution plasma-apply-colorscheme
                 os.environ["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path=/run/user/{os.getuid()}/bus"#plasma-apply-wallpaperimage
-                command_path = os.path.join("/usr/lib/kf5/bin", widget_utilities[value])
-                if os.path.exists(command_path):
-                    command = [f"{command_path}", f"{data}"]
-                    print(command)
-                    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    stdout, stderr = proc.communicate()
-                    if proc.returncode == 0:
-                        output = stdout.decode("utf-8").strip()
-                    else:
-                        error = stderr.decode("utf-8").strip()
+                os.environ["PATH"] = f"{get_homedir(self.username)}/bin:/usr/local/bin:/usr/lib/kf5/bin:/usr/bin:/bin:/usr/games:/var/lib/snapd/snap/bin"#environment variable for accessing binary files without hard links
+                command = [f"{widget_utilities[value]}", f"{data}"]
+                proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = proc.communicate()
+                if proc.returncode == 0:
+                    output = stdout.decode("utf-8").strip()
                 else:
-                    pass
+                    error = stderr.decode("utf-8").strip()
             else:
                 pass
         except OSError as e:
