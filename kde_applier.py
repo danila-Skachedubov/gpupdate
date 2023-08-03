@@ -28,12 +28,23 @@ class kde_applier_user(applier_frontend):
     __module_experimental = False
     __module_enabled = True
     __hkcu_branch = 'Software\\BaseALT\\Policies\\KDE\\'
+    __lock_branch = 'Software\\BaseALT\\Policies\\KDELocks\\'
+    widget_utilities = {
+            'colorscheme': 'plasma-apply-colorscheme',
+            'cursortheme': 'plasma-apply-cursortheme',
+            'desktoptheme': 'plasma-apply-desktoptheme',
+            'wallpaperimage': 'plasma-apply-wallpaperimage'
+        }
+
 
     def __init__(self, storage, sid=None, username=None):
         self.storage = storage
         self.username = username
         self.sid = sid
+        self.locks_dict = {}
         kde_filter = '{}%'.format(self.__hkcu_branch)
+        locks_filter = '{}%'.format(self.__lock_branch) 
+        self.locks_settings = self.storage.filter_hkcu_entries(self.sid, locks_filter)
         self.kde_settings = self.storage.filter_hkcu_entries(self.sid, kde_filter)
         self.__module_enabled = check_enabled(
             self.storage,
@@ -45,18 +56,23 @@ class kde_applier_user(applier_frontend):
         '''
         Method used to parse hive_key
         '''
+        for locks in self.locks_settings:
+            self.locks_dict[locks.valuename] = locks.data
         for setting in self.kde_settings:
+            self.valuenameForDict = setting.valuename
             valuename = setting.valuename.split('.')
             self.file = valuename[0]
             self.value = valuename[1]
             self.data = string_to_literal_eval(setting.data)
             self.type = setting.type
             if self.file == 'plasma':
-                self.edit_config_widget(self.data, self.value)
+                self.edit_config_widget(self.data, self.value, self.valuenameForDict)
             else:
-                self.edit_config(self.file, self.data)
+                self.edit_config(self.file, self.data, self.valuenameForDict)
+           
+            
 
-    def edit_config(self, file, data):
+    def edit_config(self, file, data, valuenameForDict):
         '''
         Method for editing INI configuration files responsible for KDE settings
         '''
@@ -64,31 +80,32 @@ class kde_applier_user(applier_frontend):
         with open(config_file_path, 'a') as config_file:
             for section, values in data.items():
                 config_file.write(f"[{section}]\n")
+            if valuenameForDict in self.locks_dict:
+                if self.locks_dict[valuenameForDict] == '1':                  
+                    for key, value in values.items():
+                        config_line = f"{key}[$i]={value}\n"
+                        config_file.write(config_line)
+                elif self.locks_dict[valuenameForDict] == '0':
+                    for key, value in values.items():
+                        config_line = f"{key}={value}\n"
+                        config_file.write(config_line)
+            else:
                 for key, value in values.items():
-                    config_line = f"{key}={value}\n"
-                    config_file.write(config_line)
+                        config_line = f"{key}={value}\n"
+                        config_file.write(config_line)
 
-    def edit_config_widget(self, data, value):
+    def edit_config_widget(self, data, value, valuenameForDict):
         '''
         Method for changing graphics settings in plasma context
         '''
-        '''
-        Dictionary with key and binary value in a file for executing a command
-        '''
-        widget_utilities = {
-            'colorscheme': 'plasma-apply-colorscheme',
-            'cursortheme': 'plasma-apply-cursortheme',
-            'desktoptheme': 'plasma-apply-desktoptheme',
-            'wallpaperimage': 'plasma-apply-wallpaperimage'
-        }
         try:
-            if value in widget_utilities:
+            if value in self.widget_utilities:
                 # TODO: Выявить и добавить,по надобности, нужные переменные окружения для выполнения plasma-apply-desktoptheme и plasma-apply-cursortheme
                 os.environ["XDG_DATA_DIRS"] = f"{get_homedir(self.username)}.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share:/usr/share/kf5:/usr/share:/var/lib/snapd/desktop"#Variable for system detection of directories before files with .colors extension
                 os.environ["DISPLAY"] = ":0"#Variable for command execution plasma-apply-colorscheme
                 os.environ["DBUS_SESSION_BUS_ADDRESS"] = f"unix:path=/run/user/{os.getuid()}/bus"#plasma-apply-wallpaperimage
                 os.environ["PATH"] = f"{get_homedir(self.username)}/bin:/usr/local/bin:/usr/lib/kf5/bin:/usr/bin:/bin:/usr/games:/var/lib/snapd/snap/bin"#environment variable for accessing binary files without hard links
-                command = [f"{widget_utilities[value]}", f"{data}"]
+                command = [f"{self.widget_utilities[value]}", f"{data}"]
                 proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = proc.communicate()
                 if proc.returncode == 0:
@@ -107,7 +124,7 @@ class kde_applier_user(applier_frontend):
         '''
         Change settings applied in admin context
         '''
-
+    
     def user_context_apply(self):
         '''
         Change settings applied in user context
