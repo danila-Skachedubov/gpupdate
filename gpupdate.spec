@@ -121,7 +121,7 @@ install -Dm0644 dist/%name-scripts-run-user.service %buildroot/usr/lib/systemd/u
 install -Dm0644 dist/%name-user.timer %buildroot/usr/lib/systemd/user/%name-user.timer
 install -Dm0644 dist/system-policy-%name %buildroot%_sysconfdir/pam.d/system-policy-%name
 install -Dm0644 dist/%name-remote-policy %buildroot%_sysconfdir/pam.d/%name-remote-policy
-install -Dm0644 dist/%name.ini %buildroot%_sysconfdir/%name/%name.ini
+install -Dm0644 dist/%name.ini %buildroot%_sysconfdir/dconf/db/local.d/%name.ini
 install -Dm0644 doc/gpoa.1 %buildroot/%_man1dir/gpoa.1
 install -Dm0644 doc/gpupdate.1 %buildroot/%_man1dir/gpupdate.1
 install -Dm0644 completions/gpoa %buildroot/%_datadir/bash-completion/completions/gpoa
@@ -182,7 +182,7 @@ fi
 %dir %_sysconfdir/%name
 %_sysconfdir/control.d/facilities/*
 %config(noreplace) %_sysconfdir/%name/environment
-%config(noreplace) %_sysconfdir/%name/%name.ini
+%config(noreplace) %_sysconfdir/dconf/db/loacal.d/%name.ini
 %config(noreplace) %_sysconfdir/pam.d/system-policy-%name
 %config(noreplace) %_sysconfdir/pam.d/%name-remote-policy
 %dir %attr(0700, root, root) %_cachedir/%name
