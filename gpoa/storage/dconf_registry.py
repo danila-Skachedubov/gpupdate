@@ -163,10 +163,14 @@ class Dconf_registry():
         return None
 
     @staticmethod
-    def dconf_update(uid=None):
+    def dconf_update(uid=None, custom_db_file=None, custom_path=None):
         logdata = dict()
-        path_dconf_config = get_dconf_config_path(uid)
-        db_file = path_dconf_config[:-3]
+        if custom_path and custom_db_file:
+            path_dconf_config = custom_path
+            db_file = custom_db_file
+        else:
+            path_dconf_config = get_dconf_config_path(uid)
+            db_file = path_dconf_config[:-3]
         try:
             process = subprocess.Popen(['dconf', 'compile', db_file, path_dconf_config],
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
