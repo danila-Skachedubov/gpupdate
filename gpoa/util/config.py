@@ -64,9 +64,9 @@ class GPConfig:
         '''
         Fetch Domain Controller from configuration file.
         '''
-        if 'samba' in self.full_config:
-            if 'dc' in self.full_config['samba']:
-                return self.full_config['samba']['dc']
+        if self.__dc_entry in self.dict_backend:
+            if 'dc' in self.dict_backend[self.__dc_entry]:
+                return self.dict_backend[self.__dc_entry]['dc']
 
     def get_local_policy_template(self):
         '''
