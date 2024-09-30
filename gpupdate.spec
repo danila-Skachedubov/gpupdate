@@ -182,7 +182,7 @@ fi
 %dir %_sysconfdir/%name
 %_sysconfdir/control.d/facilities/*
 %config(noreplace) %_sysconfdir/%name/environment
-%config(noreplace) %_sysconfdir/dconf/db/loacal.d/%name.ini
+%config(noreplace) %_sysconfdir/dconf/db/local.d/%name.ini
 %config(noreplace) %_sysconfdir/pam.d/system-policy-%name
 %config(noreplace) %_sysconfdir/pam.d/%name-remote-policy
 %dir %attr(0700, root, root) %_cachedir/%name

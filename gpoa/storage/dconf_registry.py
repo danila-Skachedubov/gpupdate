@@ -606,7 +606,7 @@ def load_preg_dconf(pregfile, pathfile, policy_name, username, gpo_info):
     update_dict(Dconf_registry.global_registry_dict, dd)
 
 
-def create_dconf_ini_file(filename, data, uid):
+def create_dconf_ini_file(filename, data, uid=None):
     '''
     Create an ini-file based on a dictionary of dictionaries.
     Args:

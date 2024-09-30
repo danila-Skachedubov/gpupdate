@@ -1,7 +1,7 @@
 #
 # GPOA - GPO Applier for Linux
 #
-# Copyright (C) 2019-2020 BaseALT Ltd.
+# Copyright (C) 2019-2024 BaseALT Ltd.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-
-from configparser import ConfigParser
 
 from .util import (
       get_backends
@@ -72,6 +69,7 @@ class GPConfig:
         '''
         Fetch the name of chosen Local Policy template from
         configuration file.
+
         '''
         if self.__gpoa_entry in self.dict_backend:
             if 'local-policy' in self.dict_backend[self.__gpoa_entry]:
@@ -83,7 +81,6 @@ class GPConfig:
         self.dict_backend[self.__gpoa_entry]['local-policy'] = template_name
         self.write_config(self.dict_backend)
 
-    def write_config(self):
-        with open(self.__config_path, 'w') as config_file:
-            self.full_config.write(config_file)
-
+    def write_config(self, data):
+        self.writer(self.__config_path, data)
+        self.registry.dconf_update(custom_db_file=self.__dconf_db_path, custom_path=self.__dconf_locald_path)
