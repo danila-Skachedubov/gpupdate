@@ -25,14 +25,22 @@ from .util import (
 )
 
 class GPConfig:
-    __config_path = '/etc/gpupdate/gpupdate.ini'
+
+    __config_path = '/etc/dconf/db/local.d/gpupdate.ini'
+    __dconf_db_path = "/etc/dconf/db/local"
+    __dconf_locald_path = "/etc/dconf/db/local.d/"
+    __gpupdate_entry = "/Software/BaseALT/Configuration/gpupdate/"
+    __gpoa_entry = 'Software/BaseALT/Configuration/gpupdate/gpoa'
+    __dc_entry = 'Software/BaseALT/Configuration/gpupdate/samba'
 
     def __init__(self, config_path=None):
+        from storage.dconf_registry import Dconf_registry, create_dconf_ini_file
+        self.writer= create_dconf_ini_file
+        self.registry = Dconf_registry()
         if config_path:
             self.__config_path = config_path
 
-        self.full_config = ConfigParser()
-        self.full_config.read(self.__config_path)
+        self.dict_backend = self.registry.get_dictionary_from_dconf(self.__gpupdate_entry)
 
     def get_backend(self):
         '''
