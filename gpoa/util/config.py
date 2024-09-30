@@ -46,10 +46,10 @@ class GPConfig:
         '''
         Fetch the name of the backend from configuration file.
         '''
-        if 'gpoa' in self.full_config:
-            if 'backend' in self.full_config['gpoa']:
-                if self.full_config['gpoa']['backend'] in get_backends():
-                    return self.full_config['gpoa']['backend']
+        if self.__gpoa_entry in self.dict_backend:
+            if 'backend' in self.dict_backend[self.__gpoa_entry]:
+                if self.dict_backend[self.__gpoa_entry]['backend'] in get_backends():
+                    return self.dict_backend[self.__gpoa_entry]['backend']
 
         return 'samba'
 
