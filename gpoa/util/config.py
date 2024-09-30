@@ -73,9 +73,9 @@ class GPConfig:
         Fetch the name of chosen Local Policy template from
         configuration file.
         '''
-        if 'gpoa' in self.full_config:
-            if 'local-policy' in self.full_config['gpoa']:
-                return self.full_config['gpoa']['local-policy']
+        if self.__gpoa_entry in self.dict_backend:
+            if 'local-policy' in self.dict_backend[self.__gpoa_entry]:
+                return self.dict_backend[self.__gpoa_entry]['local-policy']
 
         return get_default_policy_name()
 
