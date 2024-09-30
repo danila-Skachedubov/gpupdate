@@ -80,8 +80,8 @@ class GPConfig:
         return get_default_policy_name()
 
     def set_local_policy_template(self, template_name='default'):
-        self.full_config['gpoa']['local-policy'] = template_name
-        self.write_config()
+        self.dict_backend[self.__gpoa_entry]['local-policy'] = template_name
+        self.write_config(self.dict_backend)
 
     def write_config(self):
         with open(self.__config_path, 'w') as config_file:
