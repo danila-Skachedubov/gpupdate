@@ -54,8 +54,8 @@ class GPConfig:
         return 'samba'
 
     def set_backend(self, backend_name='local'):
-        self.full_config['gpoa']['backend'] = backend_name
-        self.write_config()
+        self.dict_backend[self.__gpoa_entry]['backend'] = backend_name
+        self.write_config(self.dict_backend)
 
     # This function is not expected corresponding "set_dc()" function
     # because we have no way to automatically determine such kind
